@@ -1,0 +1,36 @@
+{% extends 'admin/basic.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Category Create{% endblock %}
+
+
+{% block content %}
+    <div id="page-content-wrapper">
+        {% comment %} {% with title="Category Create" %}
+            {% include "admin_dashboard/nav_bar.html" %}
+        {% endwith %}
+ {% endcomment %}
+
+        <div class="container-fluid px-4">
+            <form class="row g-2"  method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="col-6">
+                    {{ category_form.category_name|as_crispy_field }}
+                </div>
+                <div class="col-6">
+                    {{ category_form.cat_slug|as_crispy_field }}
+                </div>
+           {% comment %}      <div class="col-6">
+                    {{ category_form.parent|as_crispy_field}}
+                </div>
+                
+                {{ category_form.image|as_crispy_field}}
+
+                {{ category_form.description|as_crispy_field}}
+ {% endcomment %}
+                <div class="col-12 d-flex justify-content-center mb-5">
+                    <button type="submit" class="btn btn-primary px-4 mt-12">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

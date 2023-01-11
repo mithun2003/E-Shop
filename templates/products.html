@@ -1,0 +1,42 @@
+{% comment %}
+<div
+  class="row row-cols-1 ms-5 row-cols-lg-3 row-cols-xxl-4 row-cols-xl-3 row-cols-md-2 row-cols-sm-2 row-cols-md-me-4"
+>
+  {% for p in product%}
+  <div class="col">
+    <div class="card p_card">
+      <img
+        src="{{p.product_image.url}}"
+        class="card-img-top"
+        alt="..."
+        height="300px"
+      />
+      <div class="card-body">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text">{{p.product_name}}</p>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endcomment %}
+
+<div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content:center;">
+
+    {% for p in product %}
+    {#  Single Card Template:#}
+    <div class="card p_card" style=" margin: 10px">
+      <img src="{{ p.product_image.url }}" class="card-img-top image"  >
+      <div class="card-body">
+        
+          <h5 class="card-title">Rs.{{ p.product_price }}</h5>
+          {% comment %}<p class="card-text">{{ p.product_name }}</p>{% endcomment %}        
+          <a href="{{ p.get_url }}" class="card-text"><p>{{ p.product_name }}</p></a>
+
+         
+      </div>
+    </div>
+    {% endfor %}
+  
+  </div>
+  
