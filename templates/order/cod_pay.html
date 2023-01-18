@@ -1,0 +1,6 @@
+{% extends 'base.html'%}
+<form action="{% url 'cod_payment' order.id %}" method="post">
+    {% csrf_token %}
+    <input type="radio" name="payment_method" value="cod"> Cash on Delivery
+    <input type="submit" value="Confirm Order">
+</form>

@@ -38,12 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'shop',
-    'phonenumber_field',
     'account.apps.AccountConfig',
-     'admin_custom.apps.AdminCustomConfig',
-    "crispy_forms",
-    "crispy_bootstrap5",
-    "mptt",
+    'admin_custom.apps.AdminCustomConfig',
+    'cart.apps.CartConfig',
+    'order.apps.OrderConfig',
+    'wishlist.apps.WishlistConfig',
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'shop.models.menu_links',
+                'cart.context_processors.counter',
             ],
         },
     },
@@ -142,4 +144,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = BASE_DIR / 'uploads'
 MEDIA_URL = '/media/'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
+EMAIL_HOST_USER = 'mithuncy65@gmail.com' 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587 
+EMAIL_USE_TLS = True 
+EMAIL_HOST_PASSWORD = "neyirtdmvyoyypry"

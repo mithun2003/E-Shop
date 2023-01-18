@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.urls import reverse
+
+from admin_custom.models import Category
 """ from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 # Create your models here. """
 
-class Category(models.Model):
+""" class Category(models.Model):
     category_name= models.CharField(max_length=50,unique=True)
     cat_slug = models.SlugField(max_length=100,unique=True)
        
@@ -19,11 +19,11 @@ class Category(models.Model):
         
     def __str__(self):
         return self.category_name
-    
+     """
 def menu_links(request):
     links = Category.objects.all()
     return dict(links=links)
-    
+"""     
 class Product(models.Model):
     product_name = models.CharField(max_length=200) 
     slug = models.SlugField(max_length=200, unique=True)
@@ -39,9 +39,9 @@ class Product(models.Model):
         return self.product_name
     def get_url(self):
         return reverse('product_detail',args=[self.category.cat_slug, self.slug])
+         """
         
-        
-class VariationManager(models.Manager):
+""" class VariationManager(models.Manager):
     def colors(self):
         return super(VariationManager,self).filter(variation_category='color',is_active=True)
 
@@ -62,19 +62,19 @@ class Variation(models.Model):
     objects=VariationManager()
     
     def __str__(self):
-        return self.variation_value
+        return self.variation_value """
     
-class ProductGallery(models.Model):
-    product = models.ForeignKey(Product,default=None,on_delete=models.CASCADE)
+""" class ProductGallery(models.Model):
+    product = models.ForeignKey(Product,default=None,on_delete=models.CASCADE,related_name='images')
     image = models.ImageField(upload_to='product',max_length=255)
-    
+    default = models.BooleanField(default=False)
     def __str__(self):
         return self.product.product_name
     
     class Meta:
         verbose_name='productgallery'
-        verbose_name_plural = 'product gallery'
-        
+        verbose_name_plural = 'product gallery' """
+"""         
 class Banner(models.Model):
     name = models.CharField(max_length=200) 
     image = models.ImageField(default='' , upload_to='banner')
@@ -82,4 +82,4 @@ class Banner(models.Model):
     def __str__(self):
         return self.name
     
-
+ """

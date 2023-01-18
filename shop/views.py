@@ -10,52 +10,20 @@ from datetime import date
 from .forms import *
 from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
 from django.db.models import Q
-from .models import *
+from admin_custom.models import *
+from cart.models import *
+from cart.views import _cart_id
+from wishlist.models import Wishlist
 # Create your views here.
-""" def registerPage(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    else:
-        form = CreateUserForm()
-        if request.method == 'POST':
-            form = CreateUserForm(request.POST)
-            if form.is_valid():
-                form.save()
-                user = form.cleaned_data.get('username')
-                messages.success(
-                    request, 'Profile created successfully' + user)
-                return redirect('login')
-        context = {'form': form}
-        return render(request, 'register.html', context) """
-""" 
-def registerPage(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    form=CreateUserForm()
-    if request.method=='POST':
-        form=CreateUserForm(request.POST)
-        if form.is_valid():
-          
-            form.save()
-            name = form.cleaned_data.get('name')
-            pwd = form.cleaned_data.get('password1')
-            user=authenticate(name=name,password=pwd)
-            login(request,user)
-            return redirect('home')
-        else:
-            messages.error(request,'An error occurred during registration')
-    return render(request,'register.html',{'form':form}) 
- """
+
 def index(request):
     #product = get_object_or_404(Product, id)
-    today = date.today()
-    if 'name':
-        dict_docs = {
-            'product': Product.objects.all().order_by('-updated_at'),
-            'banner':Banner.objects.all(),
-        }
-        return render(request, 'home.html', dict_docs)
-    return redirect('login')
+    
+    context = {
+        'product': Product.objects.all().order_by('-updated_at'),
+        'banner':Banner.objects.all(),
+    }
+    return render(request, 'home.html', context)
 
 """ 
 def loginPage(request):
@@ -107,17 +75,30 @@ def store(request, category_slug=None):
     return render(request, 'store.html', context)
 
 def product_detail(request,category_slug,product_slug):
-    try:
-        single_product = Product.objects.get(category__cat_slug=category_slug,slug=product_slug)
-        #in_cart= CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
-    except Exception as e:
-        raise e
+    """   try:
+       single_product = Product.objects.get(category__cat_slug=category_slug,slug=product_slug)
+       #in_cart= CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
+   except Exception as e:
+       raise e
+   product_gallery = ProductGallery.objects.filter(product_id=single_product)
+   context ={
+       'single_product':single_product,
+       #'in_cart':in_cart,
+       'product_gallery':product_gallery,
+       
+   } """
+    single_product = Product.objects.get(category__cat_slug=category_slug,slug=product_slug)
+    in_cart= CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
     product_gallery = ProductGallery.objects.filter(product_id=single_product)
-    context ={
+
+    wishlist_items = Wishlist.objects.filter(user=request.user, product=single_product).exists()
+   
+
+    context = {
         'single_product':single_product,
-        #'in_cart':in_cart,
+        'in_cart':in_cart,
         'product_gallery':product_gallery,
-        
+        'wishlist_items': wishlist_items
     }
     
     return render(request, 'product_detail.html',context)

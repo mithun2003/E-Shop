@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser , BaseUserManager
+from django.utils import timezone
+#from django.utils import timezone
 
 # Create your models here.
 
@@ -20,7 +22,7 @@ class MyAccountManager(BaseUserManager):
             phone_number = phone_number,
         )
 
-        user.is_active = True
+        user.is_active = False
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -71,3 +73,8 @@ class User(AbstractBaseUser):
     
     def has_module_perms(self, app_label):
         return True
+
+class OTP(models.Model):
+    otp = models.CharField(max_length=6)
+    expiration_time = models.DateTimeField()
+    user = models.OneToOneField(User, on_delete=models.CASCADE)

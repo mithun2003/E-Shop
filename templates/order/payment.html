@@ -1,0 +1,153 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<section class="section-content padding-y bg" style='margin-top:100px;'>
+  <div class="container">
+    {% include 'alerts.html' %}
+    <!-- ============================ COMPONENT 1 ================================= -->
+    <div class="row">
+      <aside class="col-lg-8">
+        <div class="card">
+            <h5 class="card-header">Billing Address</h5>
+            <div class="card-body">
+              <p class="card-text mb-0">{{order.full_name}}</p>
+              <p class="card-text mb-0">{{order.address_line_1}}</p>
+              <p class="card-text mb-0">{{order.address_line_2}}</p>
+              <p class="card-text mb-0">{{order.city}},{{order.state}}</p>
+              <p class="card-text mb-0">{{order.country}}</p>
+              <p class="card-text mb-0">{{order.pincode}}</p>
+            </div>
+          </div>
+        <!-- card.// -->
+      </aside>
+      <!-- col.// -->
+      <aside class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <dl class="dlist-align">
+              <dt>Total price:</dt>
+              <dd class="text-right">₹{{total}}</dd>
+            </dl>
+            <dl class="dlist-align">
+              <dt>Tax:</dt>
+              <dd class="text-right">₹{{tax}}</dd>
+            </dl>
+            
+            {% comment %} {% if coupon_obj.discount_price %}       
+            <dl class="dlist-align">
+              <dt>Discount:</dt>
+              <dd class="text-right">₹{{coupon_obj.discount_price}}</dd>
+            </dl>
+            {% else %}
+            {% endif %} {% endcomment %}
+            <dl class="dlist-align">
+              <dt>Total:</dt>
+              <dd class="text-right text-dark b"><strong>₹{{grand_total| floatformat:2}}</strong></dd>
+            </dl>
+            <hr />
+            <p class="text-center mb-3">
+              <img src="{% static 'img/payments.png'%}" height="26" />
+            </p>
+          
+          <div id="paypal-button-container"></div>
+          <a href="{% url 'success' %}" class="btn rounded-pill  btn-block my-3" style="height:40px;background:#0070ba;color:white;font-size:20px;font-weight:500;" name='status'>
+              COD
+          </a>
+           
+          </div>
+          <!-- card-body.// -->
+        </div>
+        <!-- card.// -->
+      </aside>
+      <!-- col.// -->
+    </div>
+
+    <!-- row.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+  </div>
+  <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+ var amount='{{grand_total}}'
+ var url='{% url 'payment' %}'
+ var csrftoken = getCookie('csrftoken');
+ var orderID = '{{order.order_name}}'
+ var payment_method="Paypal"
+
+  paypal.Buttons({
+
+      style : {
+        color:'blue',
+        shape:'pill',
+        label:'pay',
+        height:40,
+      },
+
+
+    // Sets up the transaction when a payment button is clicked
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: amount // Can also reference a variable or function
+          }
+        }]
+      });
+    },
+
+
+    // Finalize the transaction after payer approval
+    onApprove: (data, actions) => {
+      return actions.order.capture().then(function(orderData) {
+        // Successful capture! For dev/demo purposes:
+        console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+        const transaction = orderData.purchase_units[0].payments.captures[0];
+        
+        console.log(details);
+        sendData();
+
+        function sendData(){
+          fetch(url,{
+            method : "POST",
+            headers:{
+              "Content-type":"application/json",
+              "X-CSRFTOken":csrftoken,
+            },
+            body:JSON.stringify({
+              orderID: orderID,
+              transID:details.id,
+              payment_method:payment_method,
+              statue:details.status,
+            }),
+
+          })
+          //.then((response) => response.json())
+          //.then((data) => console.log(data));
+
+        }
+
+        // When ready to go live, remove the alert and show a success message within this page. For example:
+        // const element = document.getElementById('paypal-button-container');
+        // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+        // Or go to another URL:  actions.redirect('thank_you.html');
+      });
+    }
+  }).render('#paypal-button-container');
+</script>
+
+{% endblock %}

@@ -158,3 +158,4 @@ def product_delete(request, product_id):
     return redirect(to='product_list')
 
 #=====END PRODUCT=====
+

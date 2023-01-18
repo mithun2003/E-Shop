@@ -2,10 +2,10 @@ from django.contrib import admin
 from .models import *
 import admin_thumbnails
 # Register your models here.
-@admin_thumbnails.thumbnail('image')
+""" @admin_thumbnails.thumbnail('image')
 class ProductGalleryInline(admin.TabularInline):
     model = ProductGallery
-    extra = 1
+    extra = 1 """
     
 class Display(admin.ModelAdmin):
     list_display =('id','product_name','product_price','category','stock','updated_at','created_at')
@@ -27,9 +27,9 @@ class VariationAdmin(admin.ModelAdmin):
     list_filter = ('product','variation_category','variation_value')
     
    
-admin.site.register(Category,CategoryAdmin)
+""" admin.site.register(Category,CategoryAdmin)
 admin.site.register(Variation,VariationAdmin)   
-admin.site.register(Product, Display)
-admin.site.register(Banner)
+admin.site.register(Product, Display) """
+""" admin.site.register(Banner) """
 
-admin.site.register(ProductGallery)
+""" admin.site.register(ProductGallery) """
