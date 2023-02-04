@@ -4,7 +4,7 @@ from .models import *
 # Register your models here.
  
 class ProductImageAdmin(admin.StackedInline):
-    model = ProductGallery
+    model = ProductImage
     list_display=['image','product']
 
 
@@ -20,10 +20,11 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'cat_slug':('category_name',)}
     list_display=('category_name','cat_slug')
 class VariationAdmin(admin.ModelAdmin):
-    list_display=('product','variation_category','variation_value','is_active')
+    list_display=('variation_category','variation_value','is_active')
     list_editable=('is_active',)
-    list_filter = ('product','variation_category','variation_value')
+    list_filter = ('variation_category','variation_value')
 admin.site.register(Variation,VariationAdmin) 
 admin.site.register(Category,CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Banner)
+

@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+#from model_utils import Choices
+from multiselectfield import MultiSelectField
+
+
 from django.utils.text import slugify
 # Create your models here.
 
@@ -23,37 +27,6 @@ class Category(models.Model):
     def __str__(self):
         return self.category_name
     
-
-    
-class Product(models.Model):
-    product_name = models.CharField(max_length=200) 
-    slug = models.SlugField(max_length=200, unique=True)
-    product_desc = models.TextField() 
-    price=models.FloatField()    
-    stock = models.IntegerField()
-    is_available = models.BooleanField(default=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE,default='',related_name='products') 
-    product_image = models.ImageField( upload_to='product')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    def __str__(self):
-        return self.product_name
-    """ def save(self, *args, **kwargs):
-        value = self.product_name
-        self.slug = slugify(value, allow_unicode=True)
-        super().save(*args, **kwargs) """
-
-    def get_url(self):
-        return reverse('product_detail',args=[self.category.cat_slug, self.slug])
-    
-class ProductGallery(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_images')
-    product_image = models.ImageField(upload_to='product')
-    default = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.product.product_name
-    
     
 class VariationManager(models.Manager):
     def colors(self):
@@ -67,7 +40,7 @@ class Variation(models.Model):
         ('color','color'),
         ('size','size'),
     )
-    product=models.ForeignKey(Product,on_delete=models.CASCADE,default='')
+    #product=models.ForeignKey(Product,on_delete=models.CASCADE,default='')
     variation_category= models.CharField(max_length=100,choices=variation_category_choice)
     variation_value = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
@@ -77,7 +50,59 @@ class Variation(models.Model):
     
     def __str__(self):
         return self.variation_value 
+       
+# class Color(models.Model):
+#     color = (
+#         ('Red', 'Red'),
+#         ('Black', 'Black'),
+#         ('Blue', 'Blue'),
+#         ('White', 'White'),
+#         ('Green', 'Green')
+#     )
+#     color= MultiSelectField(choices=color,max_choices=3,
+#                                  max_length=1000,default='')
     
+class Product(models.Model):
+
+ 
+    product_name = models.CharField(max_length=200) 
+    slug = models.SlugField(max_length=200, unique=True)
+    product_desc = models.TextField() 
+    price=models.FloatField()    
+    stock = models.IntegerField()
+    variation=models.ManyToManyField(Variation,blank=True)
+    #color = models.ManyToManyField(Color, blank=True)
+    is_available = models.BooleanField(default=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,default='',related_name='products') 
+    offer = models.FloatField(default=0,null=True,blank=True,)
+    is_offer=models.BooleanField(default=False)
+    offered_price=models.FloatField(default=0,null=True)
+    product_image = models.ImageField(upload_to='product')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return self.product_name
+    """ def save(self, *args, **kwargs):
+        value = self.product_name
+        self.slug = slugify(value, allow_unicode=True)
+        super().save(*args, **kwargs) """
+
+    def get_url(self):
+        return reverse('product_detail',args=[self.category.cat_slug, self.slug])
+    class Meta:
+        ordering = ('product_name',)
+        verbose_name = 'My Model'
+        verbose_name_plural = 'My Models'
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_images')
+    image = models.ImageField(upload_to='product')
+    default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.product.product_name
+    
+    
+
      
 class Banner(models.Model):
     name = models.CharField(max_length=200) 

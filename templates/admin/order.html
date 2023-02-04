@@ -1,0 +1,124 @@
+{% extends 'admin/admindemo.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Sales{% endblock %}
+
+{% block content %}
+    <div id="page-content-wrapper">
+      
+        <div class="container-fluid px-4">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="container-fluid p-0">
+                        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            </button>
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %} 
+        <div class="row mt-5">
+            <div class="row">
+                <div class="col-md-5">
+                    <form class="d-flex" method="POST">
+                        {% csrf_token %}
+                        <input class="form-control me-2" type="search" placeholder="Search order" name="keyword" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                </div>
+
+                <div class="col-md-7 d-flex flex-row-reverse mb-2">
+                    <form action="{% url 'sales_report' %}"" class="d-flex"  method="POST" >
+                        {% csrf_token %}
+                        {{ date_form.year|as_crispy_field }}
+                        {{ date_form.month|as_crispy_field }}
+                        <button type="submit" class="btn btn-outline-danger mx-1 my-3"><i class="fas fa-file-export"></i> Sales Report</button>
+                    </form>
+                </div>
+
+              <div class="col-md-7 d-flex flex-row-reverse mb-2">
+                    
+{% comment %}                   <a href="{% url 'sales_report'%}" class="btn btn-outline-danger mx-1 my-3"><i class="fas fa-file-export"></i> Sales Report</a>
+ {% endcomment %}                    
+                </div>
+        </div>
+
+            </div>
+            <div class="row my-1">
+                <div class="col">
+                    <table class="table bg-white rounded shadow-sm  table-hover" id="example">
+                        <thead>
+                            <tr>
+                                <th scope="col" width="50">#</th>
+                                <th scope="col" >Order Number</th>
+                                <th scope="col">User</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Is Ordered</th>
+                                <th scope="col">Payment Method</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        {% for order in orders %}
+                            <tbody>
+                                <tr data-href="{% url 'order_update' order.order_number %}" >
+                                    <td scope="row">{{ order.id }}</td>
+                                    <td><a href="{% url 'order_update' order.order_number %}">{{ order.order_number}}</a></td>
+                                  
+                                    <td>{{ order.user.email }}</td>
+                                    <td>{{ order.order_total}}</td>
+                                    <td>{{ order.created_at}}</td>
+                                    <td>{{ order.is_ordered}}</td>
+                                    <td>{{ order.payment.payment_method}}</td>
+                                    <td>
+                                        {% if order.status == "Pending" %}
+                                            <span class="p-1 mb-2 bg-danger text-white rounded">{{ order.status }}</span>
+                                        {% elif order.status == "Placed" %}
+                                        <span class="p-1 mb-2 bg-secondary text-white rounded">{{ order.status }}</span>
+                                        {% elif order.status == "Confirmed" %}
+                                            <span class="p-1 mb-2 bg-primary text-white rounded">{{ order.status }}</span>
+                                        {% elif order.status == "Out For Shipping" %}
+                                            <span class="p-1 mb-2 bg-warning text-dark rounded">{{ order.status }}</span>
+                                        {% elif order.status == "Canceled" %}
+                                            <span class="p-1 mb-2 bg-danger text-white rounded">{{ order.status }}</span>
+                                        {% else %}
+                                            <span class="p-1 mb-2 bg-success text-white rounded">{{ order.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                    <tr class="text-center">
+                                        <td colspan="8">There are no Record Found!</td>
+                                    </tr>
+                            </tbody>
+                        {% endfor%}
+                    </table>
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            {% if orders.has_previous %}
+                                <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}">Previous</a></li>
+                            {% endif %}
+                            {% for i in orders.paginator.page_range %}
+                                {% if orders.number == i %}
+                                    <li class="page-item active "><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if orders.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}">Next</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/view.js' %}"></script>
+
+{% endblock scripts %}

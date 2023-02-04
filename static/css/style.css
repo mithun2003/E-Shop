@@ -131,10 +131,8 @@ nav ul li {
 
 /* -----PRODUCT----- */
 .p_card {
-
     margin-bottom: 50px;
-    width: 18rem;
-
+    width: 16rem;
 }
 
 
@@ -497,3 +495,18 @@ ul.thumb{
     text-decoration: line;
     color: #212529;
   }
+
+
+/* DASHBOARD SIDEBAR CSS */
+.list-group-item.active {
+  z-index: 2;
+  color: #fff;
+  background-color: #212529;
+  border-color: #212529;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+  color: #fff;
+  text-decoration: none;
+  background-color: #212529;
+}

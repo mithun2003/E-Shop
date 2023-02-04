@@ -1,0 +1,86 @@
+{% extends 'admin/admindemo.html' %}
+
+    {% block content %}
+    {% load static %}
+
+                <!-- Table Start -->
+                <div class="container-fluid pt-4 px-4">
+                <div class="bg-light rounded-top p-4">
+
+                    <div class="row ">
+                        <div class="col-sm-12 col-xl-12">
+                            <div class="bg-light rounded h-100 p-4">
+                                <h6 class="mb-4">Coupon Table </h6>
+                                <a href="{% url 'coupon_create' %}" type="button" class="btn btn-dark mb-3">Add Coupon</a>
+                                <table class="table" id="example">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Coupon Code</th>
+                                            <th scope="col">Coupon Amount</th>
+                                            <th scope="col">Min Amount</th>
+                                            <th scope="col">is_expired</th>
+                                            <th scope="col">Created</th>
+                                            <th scope="col">Used</th>
+                                            <th scope="col">Max Use</th>
+                                            <th scope="col">Admin Control</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        {% for coupon in coupon %}
+
+                                        <tr>
+                                            <th scope="row">{{ forloop.counter }}</th>
+
+                                            {% comment %} <th scope="row">{{categoryitem.id}}</th> {% endcomment %}
+                                            <td>{{coupon.code}}</td>
+                                            <td>{{coupon.amount}}</td>
+                                            <td>{{coupon.min_amount}}</td>
+                                            <td>{{coupon.is_expired}}</td>
+                                            <td>{{coupon.created}}</td>
+                                            <td>{{coupon.used}}</td>
+                                            <td>{{coupon.max_use}}</td>
+                                            <td style= "display: inline-flex;flex-direction: row;">
+                                                <a href="{% url 'coupon_update' coupon.id%}" type="button" class="btn btn-warning " >Edit</a>
+                                                <form method="POST" action="{% url 'coupon_delete' coupon.id %}">
+                                                    {% csrf_token %}
+                                                    <input name="method" type="hidden" value="DELETE">
+                                                    <button type="submit" onclick = "deletecoupon({{coupon.id}})" class="btn btn-xs btn-danger btn-flat show_confirm ms-1" >Delete</button>
+                                                </form></td>
+                                            <td></td>
+                                            <td>
+                                               
+                                            </td>
+                                        </tr>
+                                        
+                                        {% endfor %}
+                                        
+                                    </tbody>
+                                </table>
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination justify-content-center">
+                                        {% if coupon.has_previous %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ coupon.previous_page_number }}">Previous</a></li>
+                                        {% endif %}
+                                        {% for i in coupon.paginator.page_range %}
+                                            {% if coupon.number == i %}
+                                                <li class="page-item active "><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if coupon.has_next %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ coupon.next_page_number }}">Next</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <!--Table end-->
+  
+    {% endblock %}

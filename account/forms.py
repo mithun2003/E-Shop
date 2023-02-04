@@ -1,32 +1,24 @@
 from django import forms
-from .models import User
+from .models import User,Address
 
 
-   
-class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Enter Password',
-    }))
-    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Confirm Password'
-    }))
 
+class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name','username', 'phone_number', 'email', 'password']
+        fields = ('first_name', 'last_name', 'phone_number')
 
-    def clean(self):
-        cleaned_data = super(UserForm, self).clean()
-        password = cleaned_data.get('password')
-        confirm_password = cleaned_data.get('confirm_password')
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
 
-        if password != confirm_password:
-            message = "Password doesn't match!"
-            self.add_error('confirm_password', message)
+class AddressForm(forms.ModelForm):
+    class Meta:
+        model = Address
+        fields = ('address_line_1', 'address_line_2', 'city', 'state', 'country','pincode')
 
-    def _init_(self, *args, **kwargs):
-        super(UserForm, self)._init_(*args, **kwargs)
-        self.fields['first_name'].widget.attrs['placeholder'] = 'Enter First Name'
-        self.fields['last_name'].widget.attrs['placeholder'] = 'Enter last Name'
-        self.fields['phone_number'].widget.attrs['placeholder'] = 'Enter Phone Number'
-        self.fields['email'].widget.attrs['placeholder'] = 'Enter Email Address'
+    def __init__(self, *args, **kwargs):
+        super(AddressForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'

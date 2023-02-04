@@ -1,0 +1,37 @@
+{% extends 'admin/admindemo.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Coupon Update{% endblock %}
+
+
+{% block content %}
+    <div id="page-content-wrapper">
+      {% comment %}   {% with title="Category Update" %}
+            {% include "admin_dashboard/nav_bar.html" %}
+        {% endwith %} {% endcomment %}
+        <div class="container-fluid px-4">
+            <form class="row g-2"  method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="col-6">
+                    {{ coupon_form.code|as_crispy_field }}
+                </div>
+                <div class="col-6 mt-5">
+                    {{ coupon_form.is_expired|as_crispy_field }}
+                </div>
+                <div class="col-6">
+                    {{ coupon_form.amount|as_crispy_field }}
+                </div>
+                <div class="col-6">
+                    {{ coupon_form.min_amount|as_crispy_field }}
+                </div>
+              
+                <div class="col-6">
+                    {{ coupon_form.max_use|as_crispy_field }}
+                </div>
+              
+                <div class="col-12 d-flex justify-content-center mb-5">
+                    <button type="submit" class="btn btn-primary px-4 mt-12">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

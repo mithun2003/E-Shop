@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<section class="section-conten padding-y bg" >
+
+	{% include 'alerts.html' %}
+	<div class="container">
+		<div class="row">
+			{% include 'accounts/dashboard_sidebar.html' %}
+			<main class="col-md-9">
+				<article class="card">
+					<header class="card-header">
+						<strong class="d-inline-block mr-3">User Address</strong>
+						
+					</header>
+					<div class="card-body">
+						<div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Phone Number</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Address</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for x in current_user_address %}
+                                <tr>
+                                    <td><a href="{% url 'user_address_edit' x.id %}">{{forloop.counter}}</a></td>
+                                    <td><a href="{% url 'user_address_edit' x.id %}">{{x.user.full_name}}</a></td>
+                                    <td>{{x.user.phone_number}}</td>
+                                    <td>{{x.user.email}}</td>
+                                    <td>{{x.full_address}}</td>
+                                </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>		
+						</div>
+
+						</div> <!-- row.// -->
+					</div> <!-- card-body .// -->
+
+				</article> <!-- order-group.// -->
+			</main>
+		</div> <!-- row.// -->
+	</div>
+
+
+</section>
+
+{% endblock %}
+{% comment %} 
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <!-- Table Start -->
+
+  {% include 'accounts/dashboard_sidebar.html' %}
+  <div class="bg-light rounded ">
+
+    <h6 class="mb-4">User Address</h6>
+    <table class="table display nowrap">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">User Name</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">Email</th>
+                <th scope="col">Address</th>
+            </tr>
+        </thead>
+        <tbody>
+        
+        {% for x in current_user_address %}
+         <tr>
+            <td><a href="{% url 'user_address_edit' x.id %}">{{forloop.counter}}</a></td>
+            <td><a href="{% url 'user_address_edit' x.id %}">{{x.username}}</a></td>
+            <td><a href="{% url 'user_address_edit' x.id %}">{{x.phone_number}}</a></td>
+            <td><a href="{% url 'user_address_edit' x.id %}">{{x.email}}</a></td>
+            <td><a href="{% url 'user_address_edit' x.id %}">{{x.address}}</a></td>
+         </tr>+
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock content %} {% endcomment %}

@@ -8,13 +8,13 @@ from django.contrib import messages
 
 
 
-@login_required
+@login_required(login_url='login')
 def view_wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     context = {'wishlist_items': wishlist_items}
     return render(request, 'wishlist.html', context)
 
-@login_required
+@login_required(login_url='login')
 def add_to_wishlist(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     existing_wishlist_item = Wishlist.objects.filter(user=request.user, product=product).exists()
@@ -27,7 +27,7 @@ def add_to_wishlist(request, product_id):
         messages.success(request, 'Product added to your wishlist')   
     return redirect('wishlist')
 
-@login_required
+
 def remove_from_wishlist(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     Wishlist.objects.filter(user=request.user, product=product).delete()

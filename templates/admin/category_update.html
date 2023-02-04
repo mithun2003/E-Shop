@@ -1,4 +1,4 @@
-{% extends 'admin/basic.html' %}
+{% extends 'admindemo.html' %}
 {% load crispy_forms_tags %}
 {% block title %}Category Update{% endblock %}
 
@@ -8,7 +8,6 @@
       {% comment %}   {% with title="Category Update" %}
             {% include "admin_dashboard/nav_bar.html" %}
         {% endwith %} {% endcomment %}
-        <a href="{% url 'product_list' %}" ><button class="btn btn-success" >BACK</button></a>
         <div class="container-fluid px-4">
             <form class="row g-2"  method="POST" enctype="multipart/form-data">
                 {% csrf_token %}

@@ -1,7 +1,10 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render,get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .models import User,OTP
+from .models import *
+from cart.models import *
+from .forms import *
 import string
+from order.models import Order,OrderProduct
 from django.utils import timezone
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -10,12 +13,14 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 import pyotp
 import random
+from django.contrib import messages
 from django.views.decorators.cache import never_cache
 # Create your views here.
 
 def admin_login(request):
     if request.user.is_authenticated: 
-         return redirect('admin_dash')
+         return redirect('dashbord')
+    
     else:
         if request.method == 'POST':
             email  = request.POST['email']
@@ -25,7 +30,7 @@ def admin_login(request):
                 admin = authenticate(email = email, password = password)
                 if admin is not None:
                     login(request,admin)
-                    return redirect('admin_dash')
+                    return redirect('dashbord')
                 else:
                     messages.error(request, "Invalid password")
             except:
@@ -42,15 +47,55 @@ def user_login(request):
             email  = request.POST.get('email')
             password = request.POST.get('password')
             user = authenticate(email = email, password = password)
-            if user is not None:   
-                login(request,user)
-                return redirect('home')
-            else:
-                messages.error(request, "Invalid password")
-                #messages.error(request, "This account is blocked by admin")
-                return redirect('login') 
+            try:
+                user= User.objects.get(email=email )
+                if user.is_active and not user.is_block:
+                    user = authenticate(email = email, password = password)
+                    if user is not None:
+                        login(request,user)
+                        return redirect('home')
+                    else:
+                        messages.error(request, "Invalid password")
+                else:
+                    messages.error(request, "This account is blocked by admin")
+            except:
+                messages.error(request, "Invalid email")
     return render(request,"login.html")
 
+def otp_login(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    else:
+        if request.method == 'POST':
+            if User.objects.filter(email__iexact=request.POST['email']).exists():
+                email=email__iexact=request.POST['email']
+                print(email)
+                user = User.objects.filter(email=email).first()
+                otp = generate_otp()
+                print(otp)
+                expiration_time = timezone.now() + timezone.timedelta(minutes=5)
+                print(user)
+                #print(OTP.objects.create(otp=otp, expiration_time=expiration_time, user=user))
+                OTP.objects.create(otp=otp, expiration_time=expiration_time, user=user)
+                try:
+                    send_mail(
+                    'OTP for Signup Verification',
+                    'Your OTP is {}. It will expire in 3 minutes.'.format(otp),
+                    'mithuncy65@gmail.com',
+                    [user.email],
+                    fail_silently=False,
+                    )
+                    return redirect('verify_otp')
+                except:
+                    messages.error(request,"OTP send failed")
+            else:
+                messages.error(request,"Invalid email")
+    return render(request, 'otp_login.html')
+
+#FOR GENERATE OTP
+def generate_otp():
+    return ''.join(random.choices(string.digits, k=6))
+    #return ''.join([str(random.randint(0.9)) for i in range(6)])
 
 def user_create(request):
     if request.user.is_authenticated: 
@@ -70,6 +115,11 @@ def user_create(request):
                                     email=email,
                                     password=password)
                 user.save()
+                #create user profile
+                profile                 = Address()
+                profile.user_id         = user.id
+                #profile.profile_picture = '/default/default-user.png'
+                profile.save()
                 otp = generate_otp()
                 print(otp)
                 expiration_time = timezone.now() + timezone.timedelta(minutes=5)
@@ -81,9 +131,7 @@ def user_create(request):
                 [user.email],
                 fail_silently=False,
                 )
-                return redirect('verify_otp')
-            
-                
+                return redirect('verify_otp')       
         else:
             form=UserForm()
         context ={
@@ -91,49 +139,28 @@ def user_create(request):
         }
 
     return render(request,"register.html", context)
-#FOR GENERATE OTP
-def generate_otp():
-    return ''.join(random.choices(string.digits, k=6))
-    #return ''.join([str(random.randint(0.9)) for i in range(6)])
-""" def user_create(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    form=UserForm()
-    if request.method=='POST':
-        form=UserForm(request.POST)
-        if form.is_valid():
-          
-            form.save()
-            email = form.cleaned_data.get('email')
-            pwd = form.cleaned_data.get('password')
-            user=authenticate(email=email,password=pwd)
-            login(request,user)
-            return redirect('home')
-        else:
-            messages.error(request,'An error occurred during registration')
-    return render(request,'register.html',{'form':form})  """
-    
-""" def admin_logout(request):
-    try:
-        logout(request)
-    except:
-        pass
-    return redirect('login') """
+
+
+
     
 def verify_otp(request):
-    if request.method == 'POST':
-        otp = request.POST.get('otp')
-        try:
-            otp_obj = OTP.objects.get(otp=otp, expiration_time__gt=timezone.now())
-            user = otp_obj.user
-            user.is_active = True
-            user.save()
-            """ login(request, user)
-            return redirect('home') """
-            messages.success(request, 'Profile created successfully')
-            return redirect('login') 
-        except OTP.DoesNotExist:
-            return render(request, "verify_otp.html", {'error': 'Invalid or expired OTP'})
+    if request.user.is_authenticated: 
+         return redirect('home')
+    else:
+        if request.method == 'POST':
+            otp = request.POST.get('otp')
+            print(otp)
+            try:
+                otp_obj = OTP.objects.get(otp=otp, expiration_time__gt=timezone.now())
+                user = otp_obj.user
+                print(user)
+                if (user.is_verified != True):
+                    user.is_active = True
+                    user.save()
+                login(request, user)
+                return redirect('home') 
+            except OTP.DoesNotExist:
+                return render(request, "verify_otp.html", {'error': 'Invalid or expired OTP'})
     return render(request, "verify_otp.html")
 
 
@@ -149,6 +176,80 @@ def logoutUser(request):
     return redirect('home')
     """  if 'email' in request.session:
         request.session.flush() """
-        
-#def forgotPassword(request):
-    #return render(request, 'forgotpass.html')
+    
+    
+@login_required(login_url = 'login')
+def dashboard(request):
+    orders       = Order.objects.order_by('-created_at').filter(user_id = request.user.id, is_ordered=True)
+    orders_count = orders.count()
+    
+    print(request.user.id)
+    
+    context = {
+        'orders_count': orders_count,
+    }
+    return render(request, 'accounts/dashboard.html', context)
+    
+@login_required(login_url='login')   
+def my_orders(request):
+    orders = Order.objects.filter(user = request.user, is_ordered = True).order_by('-created_at')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'accounts/my_orders.html', context)
+
+
+@login_required(login_url='login')
+def order_detail(request, order_id):
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)  #orderproduct referred here in models
+    order = Order.objects.get(order_number=order_id)
+    coupon=UsedCoupon.objects.get(user=request.user)
+    subtotal = 0
+    for i in order_detail:
+        subtotal += i.product_price * i.quantity
+    # #coupon = CouponDetail.objects.filter(user=request.user)
+    # for i in coupon:
+    #     coupon=i
+    context = {
+        'order_detail': order_detail,
+        'order': order,
+        'subtotal': subtotal,
+        'coupon':coupon,
+     }
+    return render(request, 'accounts/order_detail.html', context)
+
+@login_required(login_url='login')
+def edit_profile(request):
+        print(Address)
+        #userprofile=Address.objects.get(user=request.user)
+        if request.method == 'POST':
+            user_form = UserProfileForm(request.POST, instance=request.user)
+            print(user_form.errors)
+            print(profile_form.errors)
+
+            if user_form.is_valid() and profile_form.is_valid():
+                user_form.save()
+                messages.success(request, 'Your profile has been updated.')
+                return redirect('edit_profile')
+        else:
+            user_form = UserProfileForm(instance=request.user)
+        context = {
+            'user_form': user_form,
+        }
+        return render(request, 'accounts/edit_profile.html', context)
+def user_address_check(request):
+    user_id = User.objects.get(email = request.user)
+    current_user_address = Address.objects.filter(user_id = user_id.pk)
+    return render(request,'accounts/useraddresscheck.html',{'current_user_address':current_user_address})
+
+
+
+
+def user_address_edit(request,id):
+    current_user_address = Address.objects.get(id=id)
+    edituseraddress = AddressForm(request.POST or None,instance=current_user_address)
+    if request.POST:
+        edituseraddress.save()
+        return redirect('user_address_check')
+    return render(request,'accounts/editaddress.html',{'forms':edituseraddress})
+

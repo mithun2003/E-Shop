@@ -1,0 +1,24 @@
+{% extends 'admin/admindemo.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<h2 class="my-5 ms-5">Add Category</h2>
+
+<div class="container-fluid px-4 ms-3">
+  <form class="row g-2"  method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="col-6">
+          {{ variation_form.variation_category|as_crispy_field }}
+      </div>
+      <div class="col-6">
+          {{ variation_form.variation_value|as_crispy_field }}
+      </div>
+      <span>Is active: {{variation_form.is_active}}</span>
+      <div class="col-12 d-flex justify-content-center mb-5">
+        <button type="submit" class="btn btn-primary px-4 mt-12">Create</button>
+    </div>
+  </form>
+</div>
+  {% endblock content %}
+  

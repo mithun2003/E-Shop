@@ -1,5 +1,6 @@
-{% extends 'admin/basic.html' %}
+{% extends 'admin/admindemo.html' %}
 {% load crispy_forms_tags %}
+{% load static%}
 {% block title %}Product{% endblock %}
 
 
@@ -14,29 +15,53 @@
         <div class="container-fluid px-4">
             <form class="row g-2"  method="POST" enctype="multipart/form-data" id ="image-form">
                 {% csrf_token %}
-                <div class="col-6">
+               {% comment %}  <div class="col-6">
                     {{ product_form.product_name|as_crispy_field }}
                 </div>
                 <div class="col-6">
-                    {{ product_form.category|as_crispy_field}}
-                </div>
+                    {{ product_form.slug|as_crispy_field}}
+                </div>  {% endcomment %}
+              
+                    <div class="form-group col-6">
+                        <label for="id_name">Name:</label>
+                        <input type="text" class="form-control" id="id_name" name="product_name">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="id_slug">Slug:</label>
+                        <input type="text" class="form-control" id="id_slug" name="slug" readonly>
+                   
+                    </div>
+                <div class="">
+                   {{ product_form.category|as_crispy_field}}
+               </div>
                 <div id="alert-box"></div>
                 <div id="image-box" class="mb-3"></div>
-                {{ product_form.product_image|as_crispy_field}}
-                
-                {{ product_image_form.product_image|as_crispy_field }}
+                {{ product_form.main_image|as_crispy_field}}
+                <button class="btn btn-primary mt-3 not-visible" id="confirm-btn">confirm</button> 
+
+                {{ product_image_form.image|as_crispy_field }}
                 {{ product_form.product_desc|as_crispy_field}}
+                {{ product_form.variation|as_crispy_field}}
+
                 <div class="col-6">
                     {{ product_form.price|as_crispy_field}}
                 </div>
                 {{ product_form.stock|as_crispy_field }}
                 {{ product_form.is_available|as_crispy_field}}
+                {{ product_form.offer|as_crispy_field}}
+                {{ product_form.is_offer|as_crispy_field }}
                 <div class="col-12 d-flex justify-content-center mb-5">
                     <button type="submit" class="btn btn-primary px-4 mt-12">Create</button>
                 </div>
             </form>
-           {% comment %}  <button class="btn btn-primary mt-3 not-visible" id="confirm-btn">confirm</button> {% endcomment %}
 
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.7/dist/cropper.min.js"></script>
+    <script src="{% static 'js/cropper.js' %}"></script>
+    <script>
+        document.getElementById('id_name').addEventListener('input', function() {
+            document.getElementById('id_slug').value = this.value.toLowerCase().replace(/[^\w]+/g,'-');
+        });
+    </script>
 {% endblock %}

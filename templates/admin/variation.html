@@ -1,0 +1,85 @@
+{% extends 'admin/admindemo.html' %}
+
+    {% block content %}
+    {% load static %}
+
+                <!-- Table Start -->
+                <div class="container-fluid pt-4 px-4">
+                <div class="bg-light rounded-top p-4">
+
+                    <div class="row ">
+                        <div class="col-sm-12 col-xl-12">
+                            <div class="bg-light rounded h-100 p-4">
+                                <h6 class="mb-4">Variation Table </h6>
+                                <a href="{% url 'variation_create' %}" type="button" class="btn btn-dark mb-3">Add Variation</a>
+                                <table class="table" id="example">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Variation Category</th>
+                                            <th scope="col">Variation Value</th>
+                                            <th scope="col">Is Active</th>
+
+                                            <th scope="col">Edit</th>
+                                            <th scope="col"></th>
+                                            <th scope="col">Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        {% for variationitem in variation %}
+
+                                        <tr>
+                                            <th scope="row">{{ forloop.counter }}</th>
+
+                                            {% comment %} <th scope="row">{{variationitem.id}}</th> {% endcomment %}
+                                            <td>{{variationitem.variation_category}}</td>
+                                            <td>{{variationitem.variation_value}}</td>
+                                            <td>{{variationitem.is_active}}</td>
+                                            <td><a href="">EDIT</a></td>
+                                            <td></td>
+                                            <td>
+                                                <form method="POST" action="{% url 'variation_delete' variationitem.id %}">
+                                                    {% csrf_token %}
+                                                    <input name="_method" type="hidden" value="DELETE">
+                                                    <button type="submit" class="btn btn-xs btn-danger btn-flat show_confirm" data-toggle="tooltip" title='Delete'>Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        
+                                        {% endfor %}
+                                        
+                                    </tbody>
+                                </table>
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination justify-content-center">
+                                        {% if variation.has_previous %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ variation.previous_page_number }}">Previous</a></li>
+                                        {% endif %}
+                                        {% for i in variation.paginator.page_range %}
+                                            {% if variation.number == i %}
+                                                <li class="page-item active "><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if variation.has_next %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ variation.next_page_number }}">Next</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <!--Table end-->
+                <script>
+                    $(document).ready(function() {
+                        $('#example').DataTable( {
+                           
+                            
+                        } );
+                    } );
+                    </script>
+    {% endblock %}
