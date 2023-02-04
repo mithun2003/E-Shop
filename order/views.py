@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from cart.models import *
-from .forms import OrderForm
+from .forms import *
 from .models import Order,Payment,OrderProduct 
 from account.models import * 
 import datetime
@@ -15,6 +15,7 @@ import json
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from admin_custom.models import Product
+from django.views.decorators.cache import never_cache
 import random
 # Create your views here.
 def Payments(request):
@@ -358,4 +359,24 @@ def cod(request,order_number):
         return redirect('success',order_number=order_number)
     else:
         return redirect('cart')
+@never_cache
+def cancel_order(request, order_no):
+    order = Order.objects.get(order_number = order_no)
+    
+    if request.method == 'POST':
+        refund_form = RefundForm(request.POST)
+        if refund_form.is_valid():
+            reason = refund_form.cleaned_data['reason']
+            refund = Refund.objects.create(user = request.user, order = order, reason = reason)
+            order.status = "Canceled"
+            order.is_ordered = False
+            order.save()
+            return redirect('my_orders')
 
+    order_items = OrderProduct.objects.filter(order = order)
+    context = {
+        'order': order,
+        'order_items': order_items,
+        'refund_form': refund_form,
+    }
+    return render(request, 'accounts/order_detail.html', context)

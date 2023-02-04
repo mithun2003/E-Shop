@@ -75,3 +75,12 @@ class OrderProduct(models.Model):
          
     def __str__(self):
         return self.product.product_name
+    
+class Refund(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
+    reason = models.TextField()
+    accepted = models.BooleanField(default=False)
+    user= models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.pk}"

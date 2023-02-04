@@ -4,14 +4,15 @@ from .models import *
 from cart.models import *
 from .forms import *
 import string
-from order.models import Order,OrderProduct
+from order.models import *
+from order.forms import *
 from django.utils import timezone
 from django.contrib import messages
 from django.core.mail import send_mail
 from admin_custom.forms import UserForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-import pyotp
+
 import random
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
@@ -189,32 +190,49 @@ def dashboard(request):
         'orders_count': orders_count,
     }
     return render(request, 'accounts/dashboard.html', context)
-    
+@never_cache
 @login_required(login_url='login')   
 def my_orders(request):
     orders = Order.objects.filter(user = request.user, is_ordered = True).order_by('-created_at')
+    order = Order.objects.filter(is_ordered = False)
+   
     context = {
         'orders': orders,
     }
     return render(request, 'accounts/my_orders.html', context)
 
-
 @login_required(login_url='login')
+@never_cache
 def order_detail(request, order_id):
     order_detail = OrderProduct.objects.filter(order__order_number=order_id)  #orderproduct referred here in models
+   
     order = Order.objects.get(order_number=order_id)
-    coupon=UsedCoupon.objects.get(user=request.user)
+    used_coupon =UsedCoupon.objects.filter(user=request.user)
+    print(used_coupon is None)
+    if used_coupon.exists:
+        coupon=None
+    else:
+        coupon=used_coupon.get(user=request.user)
     subtotal = 0
     for i in order_detail:
         subtotal += i.product_price * i.quantity
     # #coupon = CouponDetail.objects.filter(user=request.user)
     # for i in coupon:
     #     coupon=i
+    refund_form = RefundForm()    
+    order_items = OrderProduct.objects.filter(order = order)
+    if order.is_ordered == False:
+        response = redirect('my_orders')
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        return response
     context = {
         'order_detail': order_detail,
         'order': order,
         'subtotal': subtotal,
         'coupon':coupon,
+        'refund_form':refund_form,
      }
     return render(request, 'accounts/order_detail.html', context)
 

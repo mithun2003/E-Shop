@@ -1,5 +1,5 @@
 from django import forms
-from .models import Order
+from .models import Order,Refund
 
 class OrderForm(forms.ModelForm):
     class Meta:
@@ -9,3 +9,9 @@ class OrderForm(forms.ModelForm):
         super(OrderForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
+
+class RefundForm(forms.ModelForm):
+
+    class Meta:
+        model = Refund
+        fields = ['reason'] 
