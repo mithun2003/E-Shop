@@ -74,11 +74,12 @@ def otp_login(request):
                 user = User.objects.filter(email=email).first()
                 otp = generate_otp()
                 print(otp)
-                expiration_time = timezone.now() + timezone.timedelta(minutes=5)
+                expiration_time = timezone.now() + timezone.timedelta(minutes=1)
                 print(user)
                 #print(OTP.objects.create(otp=otp, expiration_time=expiration_time, user=user))
                 OTP.objects.create(otp=otp, expiration_time=expiration_time, user=user)
                 try:
+                    print('hello')
                     send_mail(
                     'OTP for Signup Verification',
                     'Your OTP is {}. It will expire in 3 minutes.'.format(otp),
@@ -86,7 +87,8 @@ def otp_login(request):
                     [user.email],
                     fail_silently=False,
                     )
-                    return redirect('verify_otp')
+                    print('hello')
+                    return render(request, "verify_otp.html",{'expiration_time':expiration_time})
                 except:
                     messages.error(request,"OTP send failed")
             else:
@@ -123,7 +125,7 @@ def user_create(request):
                 profile.save()
                 otp = generate_otp()
                 print(otp)
-                expiration_time = timezone.now() + timezone.timedelta(minutes=5)
+                expiration_time = timezone.now() + timezone.timedelta(minutes=3)
                 OTP.objects.create(otp=otp, expiration_time=expiration_time, user=user)
                 send_mail(
                 'OTP for Signup Verification',
@@ -132,7 +134,7 @@ def user_create(request):
                 [user.email],
                 fail_silently=False,
                 )
-                return redirect('verify_otp')       
+                return render(request, "verify_otp.html",{'expiration_time':expiration_time})
         else:
             form=UserForm()
         context ={
@@ -159,10 +161,36 @@ def verify_otp(request):
                     user.is_active = True
                     user.save()
                 login(request, user)
+                OTP.objects.filter(user=user).delete()
                 return redirect('home') 
             except OTP.DoesNotExist:
                 return render(request, "verify_otp.html", {'error': 'Invalid or expired OTP'})
     return render(request, "verify_otp.html")
+
+
+def resend_otp(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        if User.objects.filter(email__iexact=email).exists():
+            user = User.objects.filter(email=email).first()
+            otp = generate_otp()
+            expiration_time = timezone.now() + timezone.timedelta(minutes=5)
+            OTP.objects.create(otp=otp, expiration_time=expiration_time, user=user)
+            try:
+                send_mail(
+                'OTP for Signup Verification',
+                'Your OTP is {}. It will expire in 3 minutes.'.format(otp),
+                'mithuncy65@gmail.com',
+                [user.email],
+                fail_silently=False,
+                )
+                messages.success(request, 'OTP sent successfully')
+                return redirect('verify_otp')
+            except:
+                messages.error(request, 'OTP send failed')
+        else:
+            messages.error(request, 'Invalid email')
+    return render(request, 'otp_login.html')
 
 
 def admin_logout(request):

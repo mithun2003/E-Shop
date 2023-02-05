@@ -14,7 +14,8 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),
     path('register/', views.user_create, name='register'),
     path('logout/', views.logoutUser, name='logout'),
-    
+    path('resend_otp/', views.resend_otp, name='resend_otp'),
+
     
     path('dashboard/', views.dashboard, name="dashboard"),
     path('my_orders/',views.my_orders, name='my_orders'),
