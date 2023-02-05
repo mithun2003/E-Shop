@@ -6,6 +6,7 @@ const confirmBtn = document.getElementById('confirm-btn')
 const input = document.getElementById('id_main_image')
 
 const csrf = document.getElementsByName('csrfmiddlewaretoken')
+console.log('hello')
 
 input.addEventListener('change', ()=>{
     alertBox.innerHTML = ""
@@ -15,8 +16,8 @@ input.addEventListener('change', ()=>{
     console.log(img_data);
     console.log(url);
 
-    imageBox.innerHTML = `<img src="${url}" id="image" width="500px">`
-    var $image = $('#image')
+    imageBox.innerHTML = `<img src="${url}" id="product_image" width="500px">`
+    var $image = $('#product_image')
     console.log($image)
 
     $image.cropper({

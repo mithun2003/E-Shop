@@ -59,7 +59,7 @@ for(var i=0; i< updateBtn.length; i++){
             data: {
                 "product_id": productId,
             },
-            url: "/add_cart",
+            url: "/add_cart/productId",
             //
             success: function (response) {
                 product_id = response.product_id;
