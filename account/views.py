@@ -153,15 +153,16 @@ def verify_otp(request):
         if request.method == 'POST':
             otp = request.POST.get('otp')
             print(otp)
+            print('otp')
             try:
                 otp_obj = OTP.objects.get(otp=otp, expiration_time__gt=timezone.now())
                 user = otp_obj.user
                 print(user)
                 if (user.is_verified != True):
                     user.is_active = True
+                    OTP.objects.filter(user=user).delete()
                     user.save()
                 login(request, user)
-                OTP.objects.filter(user=user).delete()
                 return redirect('home') 
             except OTP.DoesNotExist:
                 return render(request, "verify_otp.html", {'error': 'Invalid or expired OTP'})

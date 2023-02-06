@@ -180,3 +180,5 @@ def search(request):
             print(keyword)
             return redirect('home')
     return render(request, 'store.html',context)
+#how to add price filter for searched products?
+

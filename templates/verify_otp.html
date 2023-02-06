@@ -47,7 +47,7 @@
                                         <h5 class="card-title text-center pb-0 fs-4">Confirm OTP</h5>
                                         <p class="text-center small">Enter the otp we just send you on email</p>
                                     </div>
-                                    <form class="row g-3 needs-validation" method="post" novalidate>
+                                    <form class="row g-3 needs-validation" method="post" novalidate action={% url 'verify_otp' %}>
                                         {% csrf_token %}
                                         <div class="input-container d-flex flex-row justify-content-center mt-2">
                                             <input type="text" class="m-1 text-center form-control rounded"  name="otp" maxlength="6">
@@ -90,7 +90,7 @@
         if (distance < 0) {
             clearInterval(timer);
             document.getElementById("timer").innerHTML = "Expired";
-            document.getElementById("timer").innerHTML = '<a href="{% url ''otp_login'' %}">Resend OTP</a>';
+            document.getElementById("timer").innerHTML = '<a href="{% url 'otp_login' %}">Resend OTP</a>';
 
         }
     }, 1000);
