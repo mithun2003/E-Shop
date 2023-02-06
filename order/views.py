@@ -362,7 +362,6 @@ def cod(request,order_number):
 @never_cache
 def cancel_order(request, order_no):
     order = Order.objects.get(order_number = order_no)
-    
     if request.method == 'POST':
         refund_form = RefundForm(request.POST)
         if refund_form.is_valid():
