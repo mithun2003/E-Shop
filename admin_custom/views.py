@@ -178,6 +178,7 @@ def category_delete(request, category_id):
 #=====PRODUCT=====
 @user_is_admin
 def product_list(request):
+    print('product')
     products = Product.objects.all().order_by('-updated_at')
     if request.method == 'POST':
         keyword = request.POST.get('keyword')
@@ -188,7 +189,7 @@ def product_list(request):
     content ={
         'product_details': paged_products
     }
-    return render(request,"admin/producttable.html", content)
+    return render(request,'admin/producttable.html', content)
 
 
 @user_is_admin

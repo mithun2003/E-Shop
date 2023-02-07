@@ -240,7 +240,12 @@
           <div class="card p_card" style="margin: 10px">
             <img src="{{ p.product_image.url }}" class="card-img-top image" />
             <div class="card-body">
-              <h5 class="card-title">${{ p.price }}</h5>
+              {% if p.is_offer%}
+              <del>$ {{ p.price }}</del>
+              <h5 class="card-title">$ {{ p.offered_price }}</h5>
+              {% else %}
+              <h5 class="card-title">$ {{ p.price }}</h5>
+              {% endif %}
               <a href="{{ p.get_url }}" class="card-text"><p>{{ p.product_name }}</p></a>
             </div>
           </div>

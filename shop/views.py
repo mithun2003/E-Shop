@@ -95,7 +95,13 @@ def store(request, category_slug=None):
     print(price_min)
     price_max = request.GET.get('price_max')
     print(price_max)
-
+    productz= Product.objects.filter(is_offer=True)
+    
+    for pro in productz:
+        if pro.is_offer:
+            pro.offered_price = pro.price - pro.offer
+            pro_price=pro.offered_price
+            pro.save()
 
     if category_slug != None:
         categories = get_object_or_404(Category, cat_slug=category_slug)
@@ -123,6 +129,8 @@ def store(request, category_slug=None):
 
     context = {
         'prod':prod,
+        'productz': productz,
+
         'products': paged_products,
         'product_count': product_count,
     }
