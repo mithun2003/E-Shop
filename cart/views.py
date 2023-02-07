@@ -102,10 +102,10 @@ def remove_cart(request,product_id,cart_item_id):
    
 def remove_cart_item(request,product_id,cart_item_id):
     product=get_object_or_404(Product, id=product_id)
-    cart = Cart.objects.get(cart_id=_cart_id(request))
-    cart.delete()
     cart_item = CartItem.objects.get(product=product, user=request.user,id=cart_item_id)
     cart_item.delete()
+    cart = Cart.objects.get(cart_id=_cart_id(request))
+    cart.delete()
     return redirect('cart')
     #request.session['cart_item'] = cart_item.count()
     #return redirect('cart')
