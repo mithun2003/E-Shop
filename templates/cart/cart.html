@@ -1,14 +1,16 @@
 {% extends "base.html" %} {% load static %} {% block content %}
 <section class="section-content padding-y bg" style='margin-top:7.6rem;'>
-  <div class="container">
+  <div class="container" >
     {% include 'alerts.html' %}
     <!-- ============================ COMPONENT 1 ================================= -->
     {% if not cart_items %}
+  <div  style="height: 56vh;margin-top:9rem;display: flex;justify-content: center;flex-direction: column;">
     <h2 class="text-center">Your Shopping Cart is Empty</h2>
     <br>
     <div class="text-center cart">
       <a href="{% url 'store' %}" class="btn btn-primary cart">Continue Shopping</a>
     </div>
+  </div>
     {% else %}
     <div class="row">
       <aside class="col-lg-9">
@@ -142,7 +144,7 @@
             <p class="text-center mb-3">
               <img src="{% static 'img/payments.png'%}" height="26" />
             </p>
-            <a href="{% url 'checkout' %}" class="btn btn-primary btn-block mb-3 mt-3">
+            <a href="{% url 'checkout' %}" class="btn btn-dark btn-block mb-3 mt-3">
               Checkout
             </a>
             <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>

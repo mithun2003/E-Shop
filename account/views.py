@@ -272,9 +272,8 @@ def edit_profile(request):
         if request.method == 'POST':
             user_form = UserProfileForm(request.POST, instance=request.user)
             print(user_form.errors)
-            print(profile_form.errors)
 
-            if user_form.is_valid() and profile_form.is_valid():
+            if user_form.is_valid() :
                 user_form.save()
                 messages.success(request, 'Your profile has been updated.')
                 return redirect('edit_profile')

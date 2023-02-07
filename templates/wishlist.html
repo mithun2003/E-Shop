@@ -1,21 +1,25 @@
 {% extends "base.html" %} 
 {% load static %} 
+{% block title%}Wishlist{% endblock %}
+
 {% block content %}
 {% comment %} <div style="margin-top:77px;">
 {% for item in wishlist_items %}
 <p>{{ item.product.name }} - <a href="{% url 'remove_from_wishlist' item.product.id %}">Remove</a></p>
 {% endfor %}
 </div> {% endcomment %}
-<section class="section-content padding-y bg" style='margin-top:77px;'>
-    <div class="container">
+<section class="section-content padding-y bg mb-5" style='margin-top:9rem; '>
+    <div class="container" >
       {% include 'alerts.html' %}
       <!-- ============================ COMPONENT 1 ================================= -->
       {% if not wishlist_items %}
+    <div style="height: 56vh;margin-top:9rem;display: flex;justify-content: center;flex-direction: column;">
       <h2 class="text-center">Your Shopping Wishlist is Empty</h2>
       <br>
       <div class="text-center cart">
         <a href="{% url 'store' %}" class="btn btn-primary cart">Continue Shopping</a>
       </div>
+    </div>
       {% else %}
       {% comment %} <div style="margin-top:77px;">
         {% for item in wishlist_items %}
