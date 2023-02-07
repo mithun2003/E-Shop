@@ -50,7 +50,9 @@ def user_login(request):
             user = authenticate(email = email, password = password)
             try:
                 user= User.objects.get(email=email )
-                if user.is_active and not user.is_block:
+                if not user.is_active:
+                    messages.error(request,'User is not verified')
+                elif user.is_active and not user.is_block:
                     user = authenticate(email = email, password = password)
                     if user is not None:
                         login(request,user)
