@@ -192,8 +192,8 @@ def apply_coupon(request):
             coupon = Coupon.objects.get(code__iexact = code)
             carts=Cart.objects.filter(cart_id=_cart_id(request)).first()
             cart = CartItem.objects.get(user = request.user,cart=carts)
-           
-            if coupon.used<coupon.max_use:
+            print(coupon.used == coupon.max_use)
+            if coupon.used == coupon.max_use:
                 coupon.is_expired=True
                 coupon.save()
             # if cart.coupon.used:

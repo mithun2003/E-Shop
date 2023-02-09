@@ -4,6 +4,14 @@
 {% block title %}Sales{% endblock %}
 
 {% block content %}
+<style>
+    .date{
+        height : 2rem;
+        margin-bottom:1rem;
+        margin-right:1rem;
+        
+    }
+</style>
     <div id="page-content-wrapper">
       
         <div class="container-fluid px-4">
@@ -29,11 +37,13 @@
                 </div>
 
                 <div class="col-md-7 d-flex flex-row-reverse mb-2">
-                    <form action="{% url 'sales_report' %}"" class="d-flex"  method="POST" >
+                    <form  method="POST"  action="{% url 'sales_report'%}" >
                         {% csrf_token %}
-                        {{ date_form.year|as_crispy_field }}
-                        {{ date_form.month|as_crispy_field }}
-                        <button type="submit" class="btn btn-outline-danger mx-1 my-3"><i class="fas fa-file-export"></i> Sales Report</button>
+                            <label for="start_date" >Start Date:</label>
+                            <input type="date" id="start_date" class="date " name="start_date"><br/>
+                            <label for="end_date" >End Date:</label>
+                            <input type="date" id="end_date" class="date" name="end_date">
+                        <button type="submit" formtarget="_blank" class="btn btn-outline-danger "><i class="fas fa-file-export"></i> Sales Report</button>
                     </form>
                 </div>
 

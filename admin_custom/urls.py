@@ -36,7 +36,7 @@ urlpatterns = [
     
     path('admin_dashboard/order', views.order_list, name='order_list'),
     path('admin_dashboard/<order_number>/order_update', views.order_update, name='order_update'),
-    path('sales_report/', views.sales_report, name="sales_report"),
+    path('sales_report/', views.sales_report, name='sales_report'),
     path('export/sales', views.export_sales_xls, name='export_sales'),
 
     

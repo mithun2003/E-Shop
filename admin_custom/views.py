@@ -358,6 +358,7 @@ def order_update(request, order_number):
         order_form = OrderStatusForm(request.POST, instance=order)
         if order_form.is_valid():
             order_form.save()
+        return redirect('order_list')
     else:
         order_form = OrderStatusForm(instance=order)
     #products=Product.objects.filter(order)
@@ -375,22 +376,39 @@ def order_update(request, order_number):
 
 
 def sales_report(request):
-    order = Order.objects.all().order_by('-created_at')
-    now=datetime.today()
-    data={
-        'orders': order,
-   }
-    response = HttpResponse(content_type='application/pdf')
-    filename = "Report"+str(now)+ ".pdf"
-    content = "attachment; filename="+filename
-    response['Content-Disposition'] = content
-    template = get_template("admin/order_de.html")
-    html = template.render(data)
-    result = BytesIO()
-    pdf = pisa.pisaDocument( BytesIO(html.encode("ISO-8859-1")), result)
-    if not pdf.err:
-        return HttpResponse(result.getvalue(), content_type='application/pdf')
-    return response
+    print(request.method)
+    if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        order = Order.objects.all()
+        print(start_date)
+        
+        if start_date and end_date:
+            print(start_date)
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+            order = order.order_by('-created_at').filter(created_at__range=[start_date, end_date])
+        else:
+            order = Order.objects.all().order_by('-created_at')
+        
+
+        now=datetime.today()
+        data={
+            'orders': order,
+        }
+        response = HttpResponse(content_type='application/pdf')
+        filename = "Report"+str(now)+ ".pdf"
+        content = "attachment; filename="+filename
+        response['Content-Disposition'] = content
+        template = get_template("admin/order_de.html")
+        html = template.render(data)
+        result = BytesIO()
+        pdf = pisa.pisaDocument( BytesIO(html.encode("ISO-8859-1")), result)
+        if not pdf.err:
+            return HttpResponse(result.getvalue(), content_type='application/pdf')
+        return response
+    else:
+        return redirect('order_list')
 
 
 def export_sales_xls(request, month=None, year = None):

@@ -12,6 +12,7 @@ from django.core.mail import send_mail
 from admin_custom.forms import UserForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 import random
 from django.contrib import messages
@@ -224,9 +225,11 @@ def dashboard(request):
 @never_cache
 @login_required(login_url='login')   
 def my_orders(request):
-    orders = Order.objects.filter(user = request.user, is_ordered = True).order_by('-created_at')
+    #orders = Order.objects.filter(user = request.user, is_ordered = True).order_by('-created_at')
+    p = Paginator(Order.objects.exclude(status = 'Pending').filter(user = request.user).order_by('-created_at'),10)
+    page = request.GET.get('page')
+    orders = p.get_page(page)
     order = Order.objects.filter(is_ordered = False)
-   
     context = {
         'orders': orders,
     }

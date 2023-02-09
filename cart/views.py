@@ -183,7 +183,7 @@ def checkout(request,total=0,quantity =0,cart_items=None):
             pass
         else:
             if cart.coupon:
-                if cart.coupon.used<cart.coupon.max_use:
+                if cart.coupon.used>cart.coupon.max_use:
                     cart.coupon.is_expired=True
                     cart.coupon.save()
                 if cart.coupon.min_amount<cart.sub_total():

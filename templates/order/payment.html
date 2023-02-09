@@ -34,7 +34,7 @@
             </dl>
             <dl class="dlist-align">
               <dt>Tax:</dt>
-              <dd class="text-right">$ {{tax}}</dd>
+              <dd class="text-right">$ {{tax | floatformat:2}}</dd>
             </dl>
             
             {% if cart.coupon %}       

@@ -26,6 +26,7 @@
                                         <th scope="col">Phone</th>
                                         <th scope="col">Order Total</th>
                                         <th scope="col">Date</th>
+                                        <th scope="col">Order Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,11 +39,30 @@
                                         <td>{{order.user.phone_number}}</td>
                                         <td>${{order.order_total}}</td>
                                         <td>{{order.created_at}}</td>
+                                        <td>{{order.status}}</td>
                                     </tr>
                                     {% endfor %}
 
                                 </tbody>
-                            </table>		
+
+                            </table>	
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination justify-content-center">
+                                    {% if orders.has_previous %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}">Previous</a></li>
+                                    {% endif %}
+                                    {% for i in orders.paginator.page_range %}
+                                        {% if orders.number == i %}
+                                            <li class="page-item active "><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                        {% else %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if orders.has_next %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}">Next</a></li>
+                                    {% endif %}
+                                </ul>
+                            </nav>	
 						</div>
 
 						</div> <!-- row.// -->
@@ -52,8 +72,9 @@
 			</main>
 		</div> <!-- row.// -->
 	</div>
+    
 
 
 </section>
-
+      
 {% endblock %}

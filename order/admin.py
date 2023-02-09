@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Payment,Order,OrderProduct
+from .models import Payment,Order,OrderProduct,Refund
 # Register your models here.
 
 class OrderProductInline(admin.TabularInline):
@@ -22,7 +22,10 @@ class OrderProductAdmin(admin.ModelAdmin):
     list_display =['id','user','product','quantity','product_price','created_at']
     list_display_links =['id','user','product','quantity','product_price','created_at']
     readonly_fields =('user','product','quantity','product_price','order','variations','payment','created_at')
-    
+class RefundAdmin(admin.ModelAdmin):
+    list_display=['id','user','order']   
+    list_display_links=['id','user','order']   
 admin.site.register(Payment)
 admin.site.register(Order,OrderAdmin)
+admin.site.register(Refund,RefundAdmin)
 admin.site.register(OrderProduct,OrderProductAdmin)

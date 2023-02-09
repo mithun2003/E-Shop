@@ -94,7 +94,7 @@
                                             </tr>
                                             <tr>
                                                 <th colspan="2" class="text-right">Tax:</th>
-                                                <th class="text-center">${{order.tax}} USD</th>
+                                                <th class="text-center">${{order.tax | floatformat:2}} USD</th>
                                             </tr>
                                             {% if coupon.coupon %}
                                             <tr>

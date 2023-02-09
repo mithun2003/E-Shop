@@ -63,7 +63,7 @@ class CartItem(models.Model):
         
         return sum(price)
     def expire(self):
-        if self.coupon.used<self.coupon.max_use:
+        if self.coupon.used>self.coupon.max_use:
                 self.coupon.is_expired=True
                 self.coupon.save()
             
