@@ -88,6 +88,7 @@ def logoutUser(request):
     return redirect('home')
 
 def store(request, category_slug=None):
+
     categories = None
     products = None
     prod=None
@@ -96,7 +97,8 @@ def store(request, category_slug=None):
     price_max = request.GET.get('price_max')
     print(price_max)
     productz= Product.objects.filter(is_offer=True)
-    
+    value=price_min
+    options = [    {'value': 0, 'display': '$0'},    {'value': 50, 'display': '$50'},    {'value': 100, 'display': '$100'},    {'value': 150, 'display': '$150'},    {'value': 200, 'display': '$200'},    {'value': 500, 'display': '$500'},    {'value': 1000, 'display': '$1000'},]
     for pro in productz:
         if pro.is_offer:
             pro.offered_price = pro.price - pro.offer
@@ -118,19 +120,22 @@ def store(request, category_slug=None):
         product_count = products.count()
         
     products = Product.objects.all().filter(is_available=True)
-    if price_min:
-        prod = products.filter(price__gte=price_min)
+    if price_min and  price_max:
+        prod = products.filter(price__gte=price_min, price__lte=price_max)
         product_count = prod.count()
         print(product_count)
-    if price_max:
-        prod = products.filter(price__lte=price_max)
-        product_count = prod.count()
-        print(product_count)
-
+    #  if price_max:
+    #     prod = products.filter(price__lte=price_max)
+    #     product_count = prod.count()
+    #     print(product_count)
+    
     context = {
         'prod':prod,
+        'options':options,
+        'value':value,
         'productz': productz,
-
+        'price_min':price_min,
+        'price_max':price_max,
         'products': paged_products,
         'product_count': product_count,
     }
@@ -173,16 +178,32 @@ def product_detail(request,category_slug,product_slug):
 
 def search(request):
     keyword=None
+    cat = Category.objects.all()
+    print(cat)
     if 'keyword' in request.GET:
         keyword = request.GET['keyword']
         if keyword:
-            products = Product.objects.order_by('-created_at').filter(Q(product_desc__icontains=keyword) | Q(product_name__icontains=keyword))
-            product_count = products.count()
-            context={
-                'products':products,
-                'product_count':product_count,
-                'keyword':keyword,
-            }
+            care=cat.filter(Q(category_name__icontains=keyword ) )
+            print( care)
+            print( keyword )
+            print( keyword in care)
+            if care:
+                print(keyword)
+                products = Product.objects.filter(category__exact=care[0], product_name__icontains=keyword)
+                product_count = products.count()
+                context={
+                    'products':products,
+                    'product_count':product_count,
+                    'keyword':keyword,
+                }
+            else:
+                products = Product.objects.order_by('-created_at').filter( Q(product_name__icontains=keyword))
+                product_count = products.count()
+                context={
+                    'products':products,
+                    'product_count':product_count,
+                    'keyword':keyword,
+                }
             # print(keyword)
         else:
             print(keyword)
