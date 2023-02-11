@@ -1,6 +1,9 @@
 from django.shortcuts import redirect, render
 from .models import *
 from cart.models import *
+import openpyxl
+from datetime import datetime, time, timedelta
+import pytz
 from account.models import User
 from order.models import Order, OrderProduct
 from order.forms import *
@@ -377,94 +380,103 @@ def order_update(request, order_number):
 
 def sales_report(request):
     print(request.method)
+    if request.method == 'POST':    
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        order = Order.objects.all()
+        generate = request.POST.get('generate')
+        print(generate) 
+        print(start_date)
+        
+        if generate == 'PDF':
+            if start_date and end_date:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+                order = order.order_by('-created_at').filter(created_at__range=[start_date, end_date])
+            else:
+                order = Order.objects.all().order_by('-created_at')
+            
+            now=datetime.today()
+            data={
+                'start_date':start_date,
+                'end_date':end_date,
+                'orders': order,
+            }
+            response = HttpResponse(content_type='application/pdf')
+            filename = "Report"+str(now)+ ".pdf"
+            content = "attachment; filename="+filename
+            response['Content-Disposition'] = content
+            template = get_template("admin/order_de.html")
+            html = template.render(data)
+            result = BytesIO()
+            pdf = pisa.pisaDocument( BytesIO(html.encode("ISO-8859-1")), result)
+            if not pdf.err:
+                return HttpResponse(result.getvalue(), content_type='application/pdf')
+            return response
+        
+        elif generate == 'Excel': 
+            if start_date and end_date:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+                default_time = time(hour=0, minute=0, second=0)
+                # start_date = datetime.combine(start_date, default_time).replace(tzinfo=tzinfo)
+                # end_date = datetime.combine(end_date, default_time).replace(tzinfo=tzinfo)
+                print(start_date)
+                print(end_date)
+                orders = order.order_by('-created_at').filter(created_at__range=[start_date, end_date])
+            else:
+                orders = Order.objects.all().order_by('-created_at')
+                
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.append(['Order Number', 'User,' , 'Order Status' , 'Order Total' , 'Order Date',])
+            for order in orders:
+                date = order.created_at.astimezone(pytz.utc).replace(tzinfo=None)
+                #payment = order.payment.payment_method if order.payment.payment_method else "Nil"
+                ws.append([order.order_number,order.user.email,order.status, order.order_total,date,])
+            file_name = "sales_report.xlsx"
+            wb.save(file_name)
+            with open(file_name, "rb") as f:
+                response = HttpResponse(f.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                response["Content-Disposition"] = f"attachment; filename={file_name}"
+                return response
+            print(response)
+            # return response
+
+    else:
+        return redirect('order_list')
+
+
+def export_sales_xls(request):
     if request.method == 'POST':
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
         order = Order.objects.all()
-        print(start_date)
         
         if start_date and end_date:
-            print(start_date)
             start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
             end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
             order = order.order_by('-created_at').filter(created_at__range=[start_date, end_date])
         else:
             order = Order.objects.all().order_by('-created_at')
-        
 
-        now=datetime.today()
-        data={
-            'orders': order,
-        }
-        response = HttpResponse(content_type='application/pdf')
-        filename = "Report"+str(now)+ ".pdf"
-        content = "attachment; filename="+filename
-        response['Content-Disposition'] = content
-        template = get_template("admin/order_de.html")
-        html = template.render(data)
-        result = BytesIO()
-        pdf = pisa.pisaDocument( BytesIO(html.encode("ISO-8859-1")), result)
-        if not pdf.err:
-            return HttpResponse(result.getvalue(), content_type='application/pdf')
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws['A1'] = 'Start Date'
+        ws['B1'] = 'End Date'
+        ws['A2'] = start_date
+        ws['B2'] = end_date
+        ws.append(['Order Number', 'Order Date', 'Order Total'])
+        for order in orders:
+            ws.append([order.order_number, order.created_at, order.total])
+        wb.save(response)
         return response
     else:
         return redirect('order_list')
-
-
-def export_sales_xls(request, month=None, year = None):
-    date_form = DateForm()
-    if request.method == 'POST':
-        date_form = DateForm(request.POST)
-        if date_form.is_valid():
-            month = date_form.cleaned_data['month']
-            year = date_form.cleaned_data['year']
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename="sales{year}{month}.xls"'
-
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('Sales Data') # this will make a sheet named Users Data
-
-    # Sheet header, first row
-    row_num = 0
-
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-
-    columns = ['Order number', 'User', 'Grand Total', 'Payment Method', 'Status',]
-
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style) # at 0 row 0 column 
-
-    # Sheet body, remaining rows
-    font_style = xlwt.XFStyle()
-
-    if not month and not year:
-        rows = Order.objects.all().values_list('order_number','email', 'order_total', 'payment__payment_method', 'status')
-    elif not year:
-        rows = Order.objects.all().values_list('order_number','email', 'order_total', 'payment__payment_method', 'status').filter(created_at__month = month)
-    elif not month:
-        rows = Order.objects.all().values_list('order_number','email', 'order_total', 'payment__payment_method', 'status').filter(created_at__year = year)
-    else:
-        rows = Order.objects.all().values_list('order_number','email', 'order_total', 'payment__payment_method', 'status').filter(Q(created_at__month = month) | Q(created_at__year = year))
-    for row in rows:
-        row_num += 1
-        for col_num in range(len(row)):
-            print(row[col_num])
-            if col_num == 0:
-                print(row[col_num])
-                items = Order.objects.get(order_number = row[col_num])
-                ws.write(row_num, col_num, items.user.email, font_style)
-            elif col_num == 1:
-                print(row[col_num])
-                user = User.objects.get(pk = row[col_num])
-                name = user.first_name+" "+user.last_name
-                ws.write(row_num, col_num, name, font_style)
-            else:
-                ws.write(row_num, col_num, row[col_num], font_style)
-
-    wb.save(response)
-
-    return response
 
 
 

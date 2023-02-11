@@ -211,6 +211,9 @@
               {% if p.is_offer%}
               <del>$ {{ p.price }}</del>
               <h5 class="card-title">$ {{ p.offered_price }}</h5>
+              {% elif p.category.is_offer %}
+              <del>$ {{ p.price }}</del>
+              <h5 class="card-title">$ {{ p.offered_price }}</h5>
               {% else %}
               <h5 class="card-title">$ {{ p.price }}</h5>
               {% endif %}

@@ -118,6 +118,8 @@ def place_order(request,total=0,quantity =0,order=None,coupon_obj=None):
         quantity+= cart_item.quantity
         if cart_item.product.is_offer:
             total+=(cart_item.product.offered_price * cart_item.quantity)
+        elif cart_item.product.category.is_offer:
+            total+=(cart_item.product.offered_price * cart_item.quantity)
         else:
             total+=(cart_item.product.price * cart_item.quantity)
             
@@ -275,6 +277,8 @@ def Success(request,order_number):
                 print("5")
                 subtotal+=i.product.offered_price * i.quantity
                 print("6")
+            elif i.product.category.is_offer:
+                subtotal+=(i.product.offered_price * i.quantity)
             else:
                 print("7")
                 subtotal += i.product_price * i.quantity
@@ -284,7 +288,8 @@ def Success(request,order_number):
         else:
             payment = Payment.objects.get(payment_id=transID)
         print("9")
-        
+        refund_form = RefundForm()    
+
         context = {
             'order':order,
             'ordered_products':ordered_products,
@@ -293,6 +298,8 @@ def Success(request,order_number):
             'payment':payment,
             'subtotal':subtotal,
             'coupon':coupon,
+            'refund_form':refund_form,
+
             
         }
         return render(request,'order/order_complete.html', context)
@@ -370,7 +377,9 @@ def cancel_order(request, order_no):
             order.status = "Canceled"
             order.is_ordered = False
             order.save()
-            return redirect('my_orders')
+            return redirect('home')
+            # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
     order_items = OrderProduct.objects.filter(order = order)
     context = {

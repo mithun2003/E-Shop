@@ -46,6 +46,8 @@ class CartItem(models.Model):
     def sub_total(self):
         if self.product.is_offer:
             return self.product.offered_price * self.quantity
+        elif self.product.category.is_offer:
+            return self.product.offered_price * self.quantity
         else:
             return self.product.price * self.quantity
     

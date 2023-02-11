@@ -131,6 +131,8 @@ def cart(request):
                 quantity+= cart_item.quantity       
                 if cart_item.product.is_offer:
                     total+=(cart_item.product.offered_price * cart_item.quantity)
+                elif cart_item.product.category.is_offer:
+                    total+=(cart_item.product.offered_price * cart_item.quantity)
                 else:
                     total+=(cart_item.product.price * cart_item.quantity)
         tax = (2/100)*(total) 
@@ -176,6 +178,8 @@ def checkout(request,total=0,quantity =0,cart_items=None):
         for cart_item in cart_items:
             quantity+= cart_item.quantity                    
             if cart_item.product.is_offer:
+                total+=(cart_item.product.offered_price * cart_item.quantity)
+            elif cart_item.product.category.is_offer:
                 total+=(cart_item.product.offered_price * cart_item.quantity)
             else:
                 total+=(cart_item.product.price * cart_item.quantity)     

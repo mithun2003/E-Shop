@@ -104,6 +104,8 @@
                     <var class="price">$ {{cart_item.sub_total}}</var>
                     {% if cart_item.product.is_offer%}
                       <small class="text-muted">$ {{cart_item.product.offered_price}} each </small>
+                    {% elif cart_item.product.category.is_offer %}
+                      <small class="text-muted">$ {{cart_item.product.offered_price}} each </small>
                     {% else %}
                       <small class="text-muted">$ {{cart_item.product.price}} each </small>
                     {% endif %}

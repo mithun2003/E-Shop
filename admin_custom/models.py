@@ -12,7 +12,8 @@ class Category(models.Model):
     category_name= models.CharField(max_length=50,unique=True)
     cat_slug = models.SlugField(max_length=100,unique=True)
     #created = models.DateTimeField(auto_now_add=True)
-
+    is_offer = models.BooleanField(null=True,default=False)
+    offer_amount=models.FloatField(null=True,default=100)
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
@@ -80,6 +81,8 @@ class Product(models.Model):
     product_image = models.ImageField(upload_to='product')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    if is_offer == False:
+        offered_price = 0
     def __str__(self):
         return self.product_name
     """ def save(self, *args, **kwargs):
@@ -91,8 +94,8 @@ class Product(models.Model):
         return reverse('product_detail',args=[self.category.cat_slug, self.slug])
     class Meta:
         ordering = ('product_name',)
-        verbose_name = 'My Model'
-        verbose_name_plural = 'My Models'
+        verbose_name = 'Product'
+        verbose_name_plural = 'Products'
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_images')
     image = models.ImageField(upload_to='product')

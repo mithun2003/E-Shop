@@ -35,9 +35,14 @@ def index(request):
     #product = get_object_or_404(Product, id)
     #check_order_offers()
     
-    product= Product.objects.all().order_by('-updated_at')
+    product= Product.objects.filter(is_available=True).order_by('-updated_at')
     products= Product.objects.filter(is_offer=True)
-    
+    cat = Product.objects.filter(is_offer=False,category__is_offer=True)
+    for cat in cat:
+        if cat.category.is_offer:
+            cat.offered_price=cat.price - cat.category.offer_amount
+            print(cat.offered_price)
+            cat.save()
     for pro in products:
         if pro.is_offer:
             pro.offered_price = pro.price - pro.offer
@@ -53,7 +58,7 @@ def index(request):
     # if product_off.is_offer:
     #     pro_price = product_off.price-product_off.offer
     context = {
-        #'pro_price':pro_price,
+        # 'price':price,
         'product': product,
         'products': products,
         'banner':Banner.objects.all(),
@@ -96,14 +101,18 @@ def store(request, category_slug=None):
     print(price_min)
     price_max = request.GET.get('price_max')
     print(price_max)
-    productz= Product.objects.filter(is_offer=True)
+    # productz= Product.objects.filter(is_offer=True)
     value=price_min
-    options = [    {'value': 0, 'display': '$0'},    {'value': 50, 'display': '$50'},    {'value': 100, 'display': '$100'},    {'value': 150, 'display': '$150'},    {'value': 200, 'display': '$200'},    {'value': 500, 'display': '$500'},    {'value': 1000, 'display': '$1000'},]
-    for pro in productz:
-        if pro.is_offer:
-            pro.offered_price = pro.price - pro.offer
-            pro_price=pro.offered_price
-            pro.save()
+    # cat = Product.objects.filter(is_offer=False,category__is_offer=True)
+    # for cat in cat:
+    #     if cat.category.is_offer:
+    #         cat.offered_price=cat.price - cat.category.offer_amount
+    #         cat.save()
+    # for pro in productz:
+    #     if pro.is_offer:
+    #         pro.offered_price = pro.price - pro.offer
+    #         pro_price=pro.offered_price
+    #         pro.save()
 
     if category_slug != None:
         categories = get_object_or_404(Category, cat_slug=category_slug)
@@ -131,9 +140,8 @@ def store(request, category_slug=None):
     
     context = {
         'prod':prod,
-        'options':options,
         'value':value,
-        'productz': productz,
+        # 'productz': productz,
         'price_min':price_min,
         'price_max':price_max,
         'products': paged_products,
@@ -158,6 +166,7 @@ def product_detail(request,category_slug,product_slug):
     print(product_slug)
     number=(5,4,3,2,1)
     single_product = Product.objects.get(category__cat_slug=category_slug,slug=product_slug)
+    pro = Product.objects.filter(category__is_offer =True,category__cat_slug =category_slug,slug=product_slug)
     in_cart= CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
     product_gallery = ProductImage.objects.filter(product_id=single_product)
     wishlist_items=None
@@ -167,6 +176,7 @@ def product_detail(request,category_slug,product_slug):
 
     context = {
         'number':number,
+        'pro':pro,
         'single_product':single_product,
         'in_cart':in_cart,
         'product_gallery':product_gallery,

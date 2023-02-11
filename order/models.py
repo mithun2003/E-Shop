@@ -70,6 +70,8 @@ class OrderProduct(models.Model):
     def total_price(self):
         if self.product.is_offer:
             return self.quantity * self.product.offered_price 
+        elif self.product.category.is_offer:
+            return self.quantity * self.product.offered_price 
         else:  
             return self.quantity * self.product_price
          
