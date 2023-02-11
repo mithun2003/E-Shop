@@ -431,7 +431,7 @@ def sales_report(request):
             response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
             wb = openpyxl.Workbook()
             ws = wb.active
-            ws.append(['Order Number', 'User,' , 'Order Status' , 'Order Total' , 'Order Date',])
+            ws.append(['Order Number', 'User' , 'Order Status' , 'Order Total' , 'Order Date',])
             for order in orders:
                 date = order.created_at.astimezone(pytz.utc).replace(tzinfo=None)
                 #payment = order.payment.payment_method if order.payment.payment_method else "Nil"
