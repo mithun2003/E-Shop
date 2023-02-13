@@ -41,7 +41,7 @@ class CategoryForm(forms.ModelForm):
 
     class Meta:
         model = Category
-        fields = ['category_name','cat_slug']
+        fields = ['category_name','cat_slug','is_offer','offer_amount']
     
 class CouponForm(forms.ModelForm):
     class Meta:

@@ -1,4 +1,4 @@
-{% extends 'admindemo.html' %}
+{% extends 'admin/admindemo.html' %}
 {% load crispy_forms_tags %}
 {% block title %}Category Update{% endblock %}
 
@@ -16,7 +16,11 @@
                 </div>
                 <div class="col-6">
                     {{ category_form.cat_slug|as_crispy_field}}
-                
+                </div>
+                <div class="col-6">
+                    {{ category_form.is_offer|as_crispy_field}}
+                    {{ category_form.offer_amount|as_crispy_field}}
+                </div>
                 <div class="col-12 d-flex justify-content-center mb-5">
                     <button type="submit" class="btn btn-primary px-4 mt-12">Update</button>
                 </div>

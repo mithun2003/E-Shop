@@ -33,7 +33,7 @@
                                             {% comment %} <th scope="row">{{categoryitem.id}}</th> {% endcomment %}
                                             <td>{{categoryitem.category_name}}</td>
                                             <td>{{categoryitem.cat_slug}}</td>
-                                            <td><a href="{% url 'category_update' categoryitem.id  %}">EDIT</a></td>
+                                            <td><a href="{% url 'category_update' categoryitem.id  %}" class="btn btn-xs btn-warning btn-flat">EDIT</a></td>
                                             <td></td>
                                             <td>
                                                 <form method="POST" action="{% url 'category_delete' categoryitem.id %}">

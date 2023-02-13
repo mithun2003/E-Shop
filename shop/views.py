@@ -29,6 +29,8 @@ from wishlist.models import Wishlist
 #            # print(f"{off.category} - {product.Category_id} :-: price = {product.price} offers - {off.offers} offerprice {product.is_offers}")
 def error_404_view(request, exception):
     return render(request,'error_404.html')
+def view_500(request):
+    return render(request,'500.html',status=500)
 
 
 def index(request):

@@ -12,8 +12,8 @@ class Category(models.Model):
     category_name= models.CharField(max_length=50,unique=True)
     cat_slug = models.SlugField(max_length=100,unique=True)
     #created = models.DateTimeField(auto_now_add=True)
-    is_offer = models.BooleanField(null=True,default=False)
-    offer_amount=models.FloatField(null=True,default=100)
+    is_offer = models.BooleanField(default=False)
+    offer_amount=models.FloatField(null=True,default=0)
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
